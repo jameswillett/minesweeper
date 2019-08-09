@@ -18,7 +18,7 @@ const difficulties = [
   'Nightmare!',
 ];
 const widths = [10, 13, 15, 25, 35];
-const mineCounts = [10, 15, 30, 99, 200];
+const mineCounts = [10, 15, 30, 99, 300];
 
 const getOverlay = (cell, gameOver, hintCell) => {
   if (cell.clicked) {
@@ -215,9 +215,13 @@ class App extends Component {
         if (!cell.isMine) {
           const p = propogateMap(propagate({ ...cell, clicked: true }, this.state.board))
 
-          const maybeResetHint = this.state.hint &&
+          const maybeResetHint = this.state.hint && ((
             p[this.state.hint.y] &&
             p[this.state.hint.y][this.state.hint.x]
+          ) || (
+            cell.y === this.state.hint.y &&
+            cell.x === this.state.hint.x
+          ))
               ? { hint: null }
               : {};
 
