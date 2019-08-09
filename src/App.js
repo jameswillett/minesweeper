@@ -189,7 +189,7 @@ class App extends Component {
     this.setState({
       gameOver: true,
       losingCell,
-      status: '😵',
+      status: '🤮',
     });
   }
 
