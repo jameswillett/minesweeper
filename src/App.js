@@ -20,7 +20,7 @@ const difficulties = [
 const widths = [10, 13, 15, 25, 35];
 const mineCounts = [10, 15, 30, 99, 200];
 
-const getOverlay = (cell, gameOver) => {
+const getOverlay = (cell, gameOver, hintCell) => {
   if (cell.clicked) {
     if (cell.isMine) {
       return '💥';
@@ -35,6 +35,9 @@ const getOverlay = (cell, gameOver) => {
     return '🚩';
   } else if (cell.dunno) {
     return '❓';
+  }
+  if (!cell.clicked && hintCell && hintCell.x === cell.x && hintCell.y === cell.y) {
+    return '🈁';
   }
 }
 
@@ -133,6 +136,7 @@ class App extends Component {
       clicks: 0,
       flags: 0,
       status: '🙂',
+      hint: null,
     };
     this.handleSelect = this.handleSelect.bind(this);
     this.startGame = this.startGame.bind(this);
@@ -142,6 +146,7 @@ class App extends Component {
     this.gameOver = this.gameOver.bind(this);
     this.suspense = this.suspense.bind(this);
     this.winnerWinnerChickenDinner = this.winnerWinnerChickenDinner.bind(this);
+    this.hint = this.hint.bind(this);
   }
 
   componentWillUnmount() {
@@ -210,6 +215,12 @@ class App extends Component {
         if (!cell.isMine) {
           const p = propogateMap(propagate({ ...cell, clicked: true }, this.state.board))
 
+          const maybeResetHint = this.state.hint &&
+            p[this.state.hint.y] &&
+            p[this.state.hint.y][this.state.hint.x]
+              ? { hint: null }
+              : {};
+
           const newBoard = this.state.board.map((row, y) => row.map((cell, x) => {
             if (p && p[y] && p[y][x]) return { ...cell, clicked: !cell.flagged && !cell.dunno };
             return cell;
@@ -219,6 +230,7 @@ class App extends Component {
             board: newBoard,
             status: '🙂',
             clicks: this.state.clicks + 1,
+            ...maybeResetHint,
           }, () => {
             if (
               flatten(this.state.board)
@@ -247,6 +259,7 @@ class App extends Component {
       clicks: 0,
       status: '🙂',
       flags: mineCounts[this.state.selectedDiff],
+      hint: null,
     });
   }
 
@@ -254,6 +267,16 @@ class App extends Component {
     if (e.button === 0 && !this.state.gameOver) {
       this.setState({ status: '😲' });
     }
+  }
+
+  hint() {
+    const gaps = flatten(this.state.board).filter(c => !c.isMine && !c.clicked && !c.flagged && !c.dunno && !c.count);
+    if (gaps.length === 0) return;
+    const hintCell = gaps[Math.floor(Math.random() * gaps.length)];
+    this.setState({
+      clicks: this.state.clicks + 10,
+      hint: hintCell,
+    });
   }
 
   render() {
@@ -296,12 +319,13 @@ class App extends Component {
                   >
                     {this.state.gameOver && !cell.flagged && cell.isMine && !isLosingCell(cell)
                       ? '💩'
-                      : getOverlay(cell, this.state.gameOver)
+                      : getOverlay(cell, this.state.gameOver, this.state.hint)
                     }
                   </button>
                 ))}
               </div>
             ))}
+            <button disabled={this.state.hint} onClick={this.hint}>Gimme a dang hint</button>
           </div>
         }
       </div>
