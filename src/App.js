@@ -212,7 +212,9 @@ class App extends Component {
   handleCellClick(cell) {
     if (!cell.clicked && !cell.flagged && !cell.dunno && !this.state.gameOver) {
       this.updateCellState({ ...cell, clicked: true }, () => {
-        if (!cell.isMine) {
+        if (cell.isMine) {
+          this.gameOver(cell);
+        } else {
           const p = propogateMap(propagate({ ...cell, clicked: true }, this.state.board))
 
           const maybeResetHint = this.state.hint && ((
@@ -244,8 +246,6 @@ class App extends Component {
               this.winnerWinnerChickenDinner();
              }
           });
-        } else {
-          this.gameOver(cell);
         }
       });
     }
