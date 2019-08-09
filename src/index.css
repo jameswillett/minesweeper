@@ -1,13 +1,33 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+button {
+  display: inline-block;
+  vertical-align: bottom;
+  text-align: center;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+.butt {
+  border: 1px outset darkgray;
+  background-color: lightgray;
+  height:22px;
+  width:22px;
+  cursor:pointer;
+  font-size: 12px;
+}
+
+.statusGuy {
+  font-size: 40px;
+}
+
+.clicked {
+  border: 1px outset darkgray;
+  color: inherit;
+  background-color: #eee;
+  height:22px;
+  width:22px;
+  font-size: 12px;
+}
+
+.hud {
+  font-family: "mono";
+  font-size: 2em;
+  font-weight: 600;
 }
