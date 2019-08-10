@@ -328,7 +328,10 @@ class App extends Component {
   }
 
   handlePointerLeave(e) {
-    
+    if (this.state.touchTimer) {
+      clearInterval(this.state.touchTimer);
+      this.setState({ touchTimer: null });
+    }
   }
 
   render() {
@@ -371,7 +374,8 @@ class App extends Component {
                     // onContextMenu={(e) => e.preventDefault()}
                     onTouchStart={this.handlePointerDown(cell)}
                     onTouchEnd={this.handlePointerUp(cell)}
-                    // onPointerLeave={this.handlePointerLeave}
+                    onTouchLeave={this.handlePointerLeave}
+                    onTouchCancel={this.handlePointerLeave}
                   >
                     {this.state.gameOver && !cell.flagged && cell.isMine && !isLosingCell(cell)
                       ? '💩'
