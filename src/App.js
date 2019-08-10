@@ -83,7 +83,6 @@ const propagate = (cell, board, acc) => {
     }, acc || []);
 
     return flatten(freshNeighbors.concat(emptyNeighbors.map(n => propagate(n, board, newAcc))));
- 
   }
   return [];
 };
@@ -148,9 +147,9 @@ class App extends Component {
     this.suspense = this.suspense.bind(this);
     this.winnerWinnerChickenDinner = this.winnerWinnerChickenDinner.bind(this);
     this.hint = this.hint.bind(this);
-    this.handlePointerDown = this.handlePointerDown.bind(this);
-    this.handlePointerUp = this.handlePointerUp.bind(this);
-    this.handlePointerMove = this.handlePointerMove.bind(this);
+    // this.handlePointerDown = this.handlePointerDown.bind(this);
+    // this.handlePointerUp = this.handlePointerUp.bind(this);
+    // this.handlePointerMove = this.handlePointerMove.bind(this);
   }
 
   componentWillUnmount() {
@@ -287,49 +286,49 @@ class App extends Component {
     });
   }
 
-  handlePointerDown(cell) {
-    return (e) => {
-      e.preventDefault();
-      if (e.pointerType === 'mouse') {
-        if (e.button === 0) {
-          return this.suspense(e);
-        }
-        if (e.button === 2) {
-          // onContextMenu works better
-          // return this.handleCellRightClick(e, cell);
-        }
-      } else if (e.pointerType === 'touch') {
-        if (!this.state.gameOver) {
-          this.setState({
-            status: '😲',
-            touchTimer: setTimeout(() => this.setState({ touchTimer: null }), 500),
-          });
-        }
-      }
-    }
-  }
+  // handlePointerDown(cell) {
+  //   return (e) => {
+  //     e.preventDefault();
+  //     if (e.pointerType === 'mouse') {
+  //       if (e.button === 0) {
+  //         return this.suspense(e);
+  //       }
+  //       if (e.button === 2) {
+  //         // onContextMenu works better
+  //         // return this.handleCellRightClick(e, cell);
+  //       }
+  //     } else if (e.pointerType === 'touch') {
+  //       if (!this.state.gameOver) {
+  //         this.setState({
+  //           status: '😲',
+  //           touchTimer: setTimeout(() => this.setState({ touchTimer: null }), 500),
+  //         });
+  //       }
+  //     }
+  //   }
+  // }
 
-  handlePointerUp(cell) {
-    return (e) => {
-      if (e.pointerType === 'mouse') {
-        if (e.button === 0) {
-          return this.handleCellClick(cell);
-        }
-      }
-      if (e.pointerType === 'touch') {
-        if (this.state.touchTimer) {
-          clearInterval(this.state.touchTimer);
-          this.setState({ touchTimer: null });
-          return this.handleCellClick(cell);
-        }
-        return this.handleCellRightClick(e, cell);
-      }
-    }
-  }
+  // handlePointerUp(cell) {
+  //   return (e) => {
+  //     if (e.pointerType === 'mouse') {
+  //       if (e.button === 0) {
+  //         return this.handleCellClick(cell);
+  //       }
+  //     }
+  //     if (e.pointerType === 'touch') {
+  //       if (this.state.touchTimer) {
+  //         clearInterval(this.state.touchTimer);
+  //         this.setState({ touchTimer: null });
+  //         return this.handleCellClick(cell);
+  //       }
+  //       return this.handleCellRightClick(e, cell);
+  //     }
+  //   }
+  // }
 
-  handlePointerMove(e) {
-    console.log(e);
-  }
+  // handlePointerMove(e) {
+  //   console.log(e);
+  // }
 
   render() {
     const isLosingCell = cell =>
@@ -366,11 +365,11 @@ class App extends Component {
                     }: {}}
                     disabled={cell.clicked}
                     onContextMenu={(e) => this.handleCellRightClick(e, cell)}
-                    // onClick={() => this.handleCellClick(cell)}
-                    // onMouseDown={this.suspense}
-                    onPointerDown={this.handlePointerDown(cell)}
-                    onPointerUp={this.handlePointerUp(cell)}
-                    onPointerMove={this.handlePointerMove}
+                    onClick={() => this.handleCellClick(cell)}
+                    onMouseDown={this.suspense}
+                    // onPointerDown={this.handlePointerDown(cell)}
+                    // onPointerUp={this.handlePointerUp(cell)}
+                    // onPointerMove={this.handlePointerMove}
                   >
                     {this.state.gameOver && !cell.flagged && cell.isMine && !isLosingCell(cell)
                       ? '💩'
