@@ -137,6 +137,7 @@ class App extends Component {
       status: '🙂',
       hint: null,
       touchTimer: null,
+      justContextMenued: false,
     };
     this.handleSelect = this.handleSelect.bind(this);
     this.startGame = this.startGame.bind(this);
@@ -313,14 +314,15 @@ class App extends Component {
 
   handlePointerUp(cell) {
     return (e) => {
+      console.log('handlePointerup');
       if (e.pointerType === 'mouse') {
         if (e.button === 0) {
           return this.handleCellClick(cell);
         }
       } else {
-        if (this.state.touchTimer) {
+        if (this.state.touchTimer && !this.state.justContextMenued) {
           clearInterval(this.state.touchTimer);
-          this.setState({ touchTimer: null });
+          this.setState({ touchTimer: null, justContextMenued: false });
           return this.handleCellClick(cell);
         }
       }
@@ -368,9 +370,17 @@ class App extends Component {
                       color: colors[cell.count], fontWeight: 900,
                     }: {}}
                     disabled={cell.clicked}
-                    onMouseUp={(e) => this.handleCellClick(cell)}
+                    onMouseUp={(e) => {
+                      if (e.button === 0) {
+                        this.handleCellClick(cell)
+                      }
+                    }}
                     onMouseDown={this.suspense}
-                    onContextMenu={(e) => this.handleCellRightClick(e, cell)}
+                    onContextMenu={(e) => {
+                      this.setState({ justContextMenued: true }, () =>
+                        this.handleCellRightClick(e, cell)
+                      );
+                    }}
                     onTouchStart={this.handlePointerDown(cell)}
                     onTouchEnd={this.handlePointerUp(cell)}
                     onTouchMove={this.handlePointerLeave}
