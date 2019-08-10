@@ -318,6 +318,7 @@ class App extends Component {
           return this.handleCellClick(cell);
         }
       } else {
+        e.preventDefault();
         if (this.state.touchTimer) {
           clearInterval(this.state.touchTimer);
           this.setState({ touchTimer: null });
