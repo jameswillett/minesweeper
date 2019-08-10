@@ -297,7 +297,7 @@ class App extends Component {
           // onContextMenu works better
           return this.handleCellRightClick(e, cell);
         }
-      } else if (e.pointerType === 'touch') {
+      } else {
         if (!this.state.gameOver) {
           this.setState({
             status: '😲',
@@ -316,8 +316,7 @@ class App extends Component {
         if (e.button === 0) {
           return this.handleCellClick(cell);
         }
-      }
-      if (e.pointerType === 'touch') {
+      } else {
         if (this.state.touchTimer) {
           clearInterval(this.state.touchTimer);
           this.setState({ touchTimer: null });
@@ -367,14 +366,13 @@ class App extends Component {
                       color: colors[cell.count], fontWeight: 900,
                     }: {}}
                     disabled={cell.clicked}
-                    onClick={(e) => this.handleCellClick(cell)}
-                    onMouseDown={this.suspense}
-                    onContextMenu={(e) => this.handleCellRightClick(e, cell)}
-                    // onContextMenu={(e) => e.preventDefault()}
-                    // onPointerDown={this.handlePointerDown(cell)}
-                    // onPointerUp={this.handlePointerUp(cell)}
-                    // onPointerLeave={this.handlePointerLeave}
-
+                    // onClick={(e) => this.handleCellClick(cell)}
+                    // onMouseDown={this.suspense}
+                    // onContextMenu={(e) => this.handleCellRightClick(e, cell)}
+                    onContextMenu={(e) => e.preventDefault()}
+                    onPointerDown={this.handlePointerDown(cell)}
+                    onPointerUp={this.handlePointerUp(cell)}
+                    onPointerLeave={this.handlePointerLeave}
                   >
                     {this.state.gameOver && !cell.flagged && cell.isMine && !isLosingCell(cell)
                       ? '💩'
