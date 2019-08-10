@@ -370,8 +370,8 @@ class App extends Component {
                     onMouseDown={this.suspense}
                     onContextMenu={(e) => this.handleCellRightClick(e, cell)}
                     // onContextMenu={(e) => e.preventDefault()}
-                    // onPointerDown={this.handlePointerDown(cell)}
-                    // onPointerUp={this.handlePointerUp(cell)}
+                    onTouchStart={this.handlePointerDown(cell)}
+                    onTouchEnd={this.handlePointerUp(cell)}
                     // onPointerLeave={this.handlePointerLeave}
                   >
                     {this.state.gameOver && !cell.flagged && cell.isMine && !isLosingCell(cell)
