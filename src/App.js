@@ -171,8 +171,7 @@ class App extends Component {
     }, cb);
   }
 
-  handleCellRightClick(e, cell) {
-    e.preventDefault();
+  handleCellRightClick(cell) {
     let props = {};
     if (!cell.clicked && !this.state.gameOver) {
       if (!cell.flagged && !cell.dunno && this.state.flags > 0) {
@@ -296,7 +295,7 @@ class App extends Component {
         }
         if (e.button === 2) {
           // onContextMenu works better
-          return this.handleCellRightClick(e, cell);
+          return this.handleCellRightClick(cell);
         }
       } else {
         if (!this.state.gameOver) {
@@ -304,7 +303,7 @@ class App extends Component {
             status: '😲',
             touchTimer: setTimeout(() => {
               this.setState({ touchTimer: null, status: '🙂' });
-              this.handleCellRightClick(e, cell);
+              this.handleCellRightClick(cell);
             }, 450),
           });
         }
@@ -377,8 +376,9 @@ class App extends Component {
                     }}
                     onMouseDown={this.suspense}
                     onContextMenu={(e) => {
+                      e.preventDefaut();
                       this.setState({ justContextMenued: true }, () =>
-                        this.handleCellRightClick(e, cell)
+                        this.handleCellRightClick(cell)
                       );
                     }}
                     onTouchStart={this.handlePointerDown(cell)}
