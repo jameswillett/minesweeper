@@ -366,7 +366,7 @@ class App extends Component {
                       color: colors[cell.count], fontWeight: 900,
                     }: {}}
                     disabled={cell.clicked}
-                    onClick={(e) => this.handleCellClick(cell)}
+                    onMouseUp={(e) => this.handleCellClick(cell)}
                     onMouseDown={this.suspense}
                     onContextMenu={(e) => this.handleCellRightClick(e, cell)}
                     // onContextMenu={(e) => e.preventDefault()}
