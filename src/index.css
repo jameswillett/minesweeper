@@ -9,7 +9,7 @@ button {
   background-color: lightgray;
   height:22px;
   width:22px;
-  /* cursor:pointer; */
+  cursor:pointer;
   font-size: 12px;
 }
 
@@ -27,7 +27,7 @@ button {
 }
 
 .hud {
-  font-family: "mono";
+  font-family: "monospace"
   font-size: 2em;
   font-weight: 600;
 }
