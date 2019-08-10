@@ -302,7 +302,7 @@ class App extends Component {
         if (!this.state.gameOver) {
           this.setState({
             status: '😲',
-            touchTimer: setTimeout(() => this.setState({ touchTimer: null }), 500),
+            touchTimer: setTimeout(() => this.setState({ touchTimer: null }), 300),
           });
         }
       }
