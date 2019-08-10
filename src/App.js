@@ -313,7 +313,6 @@ class App extends Component {
 
   handlePointerUp(cell) {
     return (e) => {
-      console.log('handlePointerup');
       if (e.pointerType === 'mouse') {
         if (e.button === 0) {
           return this.handleCellClick(cell);
@@ -378,7 +377,11 @@ class App extends Component {
                     onMouseDown={this.suspense}
                     onContextMenu={(e) => {
                       e.preventDefault();
-                      this.handleCellRightClick(cell)
+                      if (!this.state.skipContextMenu) {
+                        this.handleCellRightClick(cell);
+                      } else {
+                        this.setState({ skipContextMenu: false });
+                      }
                     }}
                     onTouchStart={this.handlePointerDown(cell)}
                     onTouchEnd={this.handlePointerUp(cell)}
