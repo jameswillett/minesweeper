@@ -302,7 +302,8 @@ class App extends Component {
           this.setState({
             status: '😲',
             touchTimer: setTimeout(() => {
-              this.setState({ touchTimer: null });
+              this.setState({ touchTimer: null, status: '🙂' });
+              this.handleCellRightClick(e, cell);
             }, 450),
           });
         }
@@ -322,8 +323,6 @@ class App extends Component {
           this.setState({ touchTimer: null });
           return this.handleCellClick(cell);
         }
-        this.setState({ status: '🙂' })
-        this.handleCellRightClick(e, cell);
       }
     }
   }
