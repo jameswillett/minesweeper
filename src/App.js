@@ -376,7 +376,7 @@ class App extends Component {
                     }}
                     onMouseDown={this.suspense}
                     onContextMenu={(e) => {
-                      e.preventDefaut();
+                      e.preventDefault();
                       this.setState({ justContextMenued: true }, () =>
                         this.handleCellRightClick(cell)
                       );
