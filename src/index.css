@@ -1,3 +1,6 @@
+-webkit-touch-callout: none;
+-webkit-user-select: none; /* Disable selection/copy in UIWebView */
+
 button {
   display: inline-block;
   vertical-align: bottom;

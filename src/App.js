@@ -302,7 +302,7 @@ class App extends Component {
         if (!this.state.gameOver) {
           this.setState({
             status: '😲',
-            touchTimer: setTimeout(() => this.setState({ touchTimer: null }), 300),
+            touchTimer: setTimeout(() => this.setState({ touchTimer: null }), 500),
           });
         }
       }
@@ -311,6 +311,11 @@ class App extends Component {
 
   handlePointerUp(cell) {
     return (e) => {
+      if (e.pointerType === 'mouse') {
+        if (e.button === 0) {
+          return this.handleCellClick(cell);
+        }
+      }
       if (e.pointerType === 'touch') {
         if (this.state.touchTimer) {
           clearInterval(this.state.touchTimer);
@@ -361,7 +366,7 @@ class App extends Component {
                     }: {}}
                     disabled={cell.clicked}
                     onContextMenu={(e) => this.handleCellRightClick(e, cell)}
-                    onClick={() => this.handleCellClick(cell)}
+                    // onClick={() => this.handleCellClick(cell)}
                     // onMouseDown={this.suspense}
                     onPointerDown={this.handlePointerDown(cell)}
                     onPointerUp={this.handlePointerUp(cell)}
