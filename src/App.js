@@ -302,7 +302,7 @@ class App extends Component {
           this.setState({
             status: '😲',
             touchTimer: setTimeout(() => {
-              this.setState({ touchTimer: null, status: '🙂' });
+              this.setState({ touchTimer: null, status: '🙂', justContextMenued: true });
               this.handleCellRightClick(cell);
             }, 450),
           });
@@ -324,6 +324,7 @@ class App extends Component {
           this.setState({ touchTimer: null, justContextMenued: false });
           return this.handleCellClick(cell);
         }
+        if (this.state.justContextMenued) this.setState({ justContextMenued: false });
       }
     }
   }
