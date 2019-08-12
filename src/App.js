@@ -21,7 +21,7 @@ const mineCounts = [10, 15, 30, 99, 300];
 const score = state => Math.floor((
   (state.threeBV * mineCounts[state.difficulty]) /
   ((state.clicks || 1) * (state.time || 1))
-) * 10000);
+) * (!state.losingCell.x ? 10000 : 0));
 
 
 const getOverlay = (cell, gameOver, hintCell) => {
@@ -294,6 +294,7 @@ class App extends Component {
       threeBV,
       playing: true,
       gameOver: false,
+      losingCell: {},
       timer: setInterval(() => this.setState({ time: this.state.time + 1 }), 1000),
       time: 0,
       clicks: 0,
