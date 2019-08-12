@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import {
-  // none,
-  // equals,
   reduce,
   splitEvery,
   lensPath,
@@ -19,6 +17,12 @@ const difficulties = [
 ];
 const widths = [10, 13, 15, 25, 35];
 const mineCounts = [10, 15, 30, 99, 300];
+
+const score = state => Math.floor((
+  (state.threeBV * mineCounts[state.difficulty]) /
+  ((state.clicks || 1) * (state.time || 1))
+) * 10000);
+
 
 const getOverlay = (cell, gameOver, hintCell) => {
   if (cell.clicked) {
@@ -117,18 +121,44 @@ const makeBoard = (diff) => {
     return { ...cell, count, clicked: false, flagged: false, dunno: false, x, y }
   }));
 
+
   return boardWithCounts;
 }
+
+const get3BV = (board) => {
+  const edges = flatten(board).filter(c => !c.isMine && !c.count).reduce((a, c) => {
+    if (a.board[c.y][c.x].marked) return a;
+    const p = propogateMap(propagate({ ...c, marked: true }, board));
+
+    const newBoard = a.board.map((row, y) => row.map((cell, x) => {
+      if (p && p[y] && p[y][x]) return { ...cell, marked: true };
+      return cell;
+    }));
+
+    return { board: newBoard , chunks: a.chunks + 1 };
+  }, { board, chunks: 0 })
+
+  const bits = edges.board.filter(c => !c.marked && !c.isMine).length;
+
+  console.log(edges, bits, edges.chunks + bits);
+  console.log(edges.chunks + bits);
+
+  return edges.chunks + bits;
+};
+
 
 class App extends Component {
   constructor() {
     super();
+    const board = makeBoard(0);
+    const threeBV = get3BV(board)
     this.state = {
       playing: false,
       difficulty: 0,
       selectedDiff: 0,
       gameOver: true,
-      board: makeBoard(0),
+      board,
+      threeBV,
       losingCell: {},
       timer: null,
       time: 0,
@@ -204,12 +234,12 @@ class App extends Component {
   winnerWinnerChickenDinner() {
     console.log('winnerWinnerChickenDinner')
     if (this.state.timer) clearInterval(this.state.timer);
-    const score = Math.floor(((mineCounts[this.state.difficulty] ** 2) / (this.state.clicks * this.state.time)) * 10000);
-    alert(`your score is ${score}. not great, not terrible. you definitely didnt apply yourself`);
     this.setState({
       status: '😎',
       gameOver: true,
-    });
+    }, () =>
+      alert(`your score is ${score(this.state)}. not great, not terrible. you definitely didnt apply yourself`)
+    );
   }
 
   handleCellClick(cell) {
@@ -256,9 +286,12 @@ class App extends Component {
 
   startGame() {
     if (this.state.timer) clearInterval(this.state.timer);
+    const board = makeBoard(this.state.selectedDiff);
+    const threeBV = get3BV(board);
     this.setState({
       difficulty: this.state.selectedDiff,
-      board: makeBoard(this.state.selectedDiff),
+      board,
+      threeBV,
       playing: true,
       gameOver: false,
       timer: setInterval(() => this.setState({ time: this.state.time + 1 }), 1000),
@@ -355,6 +388,7 @@ class App extends Component {
         }
         {this.state.playing &&
           <div style={{ display: 'inline-block' }}>
+            <div className="hud">Score: {score(this.state)}</div>
             <div className="hud">
               <span style={{ float: 'left' }}>{this.state.flags}</span>
               <button className="statusGuy" onClick={this.startGame}>{this.state.status}</button>
