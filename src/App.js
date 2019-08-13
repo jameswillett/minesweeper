@@ -1,22 +1,21 @@
 import React, { Component } from 'react';
 import './App.css';
 import {
-  reduce,
-  splitEvery,
   lensPath,
   set,
   flatten,
 } from 'ramda';
 
-const difficulties = [
-  "I'm too young to die",
-  'Hey, not too rough',
-  'Hurt me plenty',
-  'Ultra-Violence',
-  'Nightmare!',
-];
-const widths = [10, 13, 15, 25, 35];
-const mineCounts = [10, 15, 30, 99, 300];
+import {
+  difficulties,
+  mineCounts,
+} from './difficultyConstants';
+import {
+  get3BV,
+  propagate,
+  propagateMap,
+  makeBoard,
+} from './functions';
 
 const score = state => Math.floor((
   (state.threeBV * mineCounts[state.difficulty]) /
@@ -57,94 +56,6 @@ const colors = [
   'darkgray',
 ];
 
-const getNeighbors = (x, y, b, includeDiag = true) => [
-  b[y - 1] && includeDiag && b[y - 1][x - 1],
-  b[y] && b[y][x - 1],
-  b[y + 1] && includeDiag && b[y + 1][x - 1],
-  b[y - 1] && b[y - 1][x],
-  b[y + 1] && b[y + 1][x],
-  b[y - 1] && includeDiag && b[y - 1][x + 1],
-  b[y] && b[y][x + 1],
-  b[y + 1] && includeDiag && b[y + 1][x + 1],
-].filter(x => x);
-
-const propagate = (cell, board, acc) => {
-  if (!cell.isMine && cell.count === 0 && !cell.flagged && !cell.dunno) {
-    const freshNeighbors = getNeighbors(cell.x, cell.y, board, true)
-      .filter(n => !acc || !acc[n.y] || !acc[n.y].includes(n.x))
-
-    const emptyNeighbors = freshNeighbors.filter(n => n.count === 0);
-
-    if (freshNeighbors.length === 0) return [];
-
-    const newAcc = freshNeighbors.reduce((a, c) => {
-      if (!a[c.y]) {
-        a[c.y] = [c.x];
-      } else {
-        a[c.y].push(c.x);
-      }
-      return a;
-    }, acc || []);
-
-    return flatten(freshNeighbors.concat(emptyNeighbors.map(n => propagate(n, board, newAcc))));
-  }
-  return [];
-};
-
-const propogateMap = reduce((a, c) => ({...a, [c.y]: { ...a[c.y], [c.x]: true }}), {});
-
-const makeBoard = (diff) => {
-  const width = widths[diff];
-  const minesCount = mineCounts[diff];
-
-  const board = Array(width ** 2).fill({});
-
-  const uniqMineLocations = (count, arr = []) => {
-    if (count === 0) return arr;
-
-    const location = Math.floor(Math.random() * (width ** 2));
-
-    if (arr.includes(location)) return uniqMineLocations(count, arr);
-
-    return uniqMineLocations(count - 1, arr.concat([location]));
-  }
-
-  const mines = uniqMineLocations(minesCount);
-
-  const boardFilledWithMines = board.map((_, i) => ({ isMine: mines.includes(i) }));
-
-  const twoDBoard = splitEvery(width, boardFilledWithMines);
-
-  const boardWithCounts = twoDBoard.map((row, y, b) => row.map((cell, x) => {
-    const count = getNeighbors(x, y, b)
-      .filter(c => c.isMine).length;
-    return { ...cell, count, clicked: false, flagged: false, dunno: false, x, y }
-  }));
-
-
-  return boardWithCounts;
-}
-
-const get3BV = (board) => {
-  const edges = flatten(board).filter(c => !c.isMine && !c.count).reduce((a, c) => {
-    if (a.board[c.y][c.x].marked) return a;
-    const p = propogateMap(propagate({ ...c, marked: true }, board));
-
-    const newBoard = a.board.map((row, y) => row.map((cell, x) => {
-      if (p && p[y] && p[y][x]) return { ...cell, marked: true };
-      return cell;
-    }));
-
-    return { board: newBoard , chunks: a.chunks + 1 };
-  }, { board, chunks: 0 })
-
-  const bits = edges.board.filter(c => !c.marked && !c.isMine).length;
-
-  console.log(edges, bits, edges.chunks + bits);
-  console.log(edges.chunks + bits);
-
-  return edges.chunks + bits;
-};
 
 
 class App extends Component {
@@ -168,6 +79,7 @@ class App extends Component {
       hint: null,
       touchTimer: null,
       skipContextMenu: false,
+      music: true,
     };
     this.handleSelect = this.handleSelect.bind(this);
     this.startGame = this.startGame.bind(this);
@@ -181,6 +93,7 @@ class App extends Component {
     this.handlePointerDown = this.handlePointerDown.bind(this);
     this.handlePointerUp = this.handlePointerUp.bind(this);
     this.handlePointerLeave = this.handlePointerLeave.bind(this);
+    this.toggleMusic = this.toggleMusic.bind(this);
   }
 
   componentWillUnmount() {
@@ -248,7 +161,7 @@ class App extends Component {
         if (cell.isMine) {
           this.gameOver(cell);
         } else {
-          const p = propogateMap(propagate({ ...cell, clicked: true }, this.state.board))
+          const p = propagateMap(propagate({ ...cell, clicked: true }, this.state.board))
 
           const maybeResetHint = this.state.hint && ((
             p[this.state.hint.y] &&
@@ -370,6 +283,16 @@ class App extends Component {
     }
   }
 
+  toggleMusic() {
+    if (this.state.music) {
+      this.player.pause();
+      this.player.currentTime = 0;
+    } else {
+      this.player.play();
+    }
+    this.setState({ music: !this.state.music });
+  }
+
   render() {
     const isLosingCell = cell =>
       this.state.losingCell.x === cell.x && this.state.losingCell.y === cell.y;
@@ -433,6 +356,17 @@ class App extends Component {
               </div>
             ))}
             <button disabled={this.state.hint} onClick={this.hint}>Gimme a dang hint</button>
+            <br />
+            {!this.state.gameOver &&
+              <div>
+                <audio loop autoPlay ref={ref => this.player = ref}>
+                  <source src='spiderman.mp3' />
+                </audio>
+                <button onClick={this.toggleMusic}>
+                  PLEASE {this.state.music ? 'STOP' : 'START'} THE MUSIC
+                </button>
+              </div>
+            }
           </div>
         }
       </div>
