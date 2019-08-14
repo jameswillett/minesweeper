@@ -416,6 +416,12 @@ class App extends Component {
                 </button>
               </div>
             }
+            <div>
+              You like this dang site?<br />
+              <a href="https://github.com/jameswillett/minesweeper">
+                Here&apos;s the dang code
+              </a>.
+            </div>
           </div>
         }
         <div className="scoreBoard">
