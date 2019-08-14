@@ -119,7 +119,6 @@ class App extends Component {
   setTop50(top50) {
     getTop50()
       .then(({ data }) => {
-        console.log(data);
         this.setState({ top50: data.rows });
       });
   }
