@@ -3,7 +3,7 @@ import axios from 'axios';
 console.log(process.env);
 const api = axios.create({
   baseURL: `http://${
-    process.env.ENV === 'prod'
+    process.env.NODE_ENV === 'production'
       ? 'cokebustapi.herokuapp.com'
       : 'localhost:4000'
   }/minesweeper`,
