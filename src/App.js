@@ -155,15 +155,16 @@ class App extends Component {
     }
   }
 
-  gameOver(losingCell) {
+  gameOver(losingCell, skipStatus = false) {
     console.log('game over man, game over');
     if (this.state.timer) clearInterval(this.state.timer);
     gameOverCall(this.state.gameID).catch(console.log)
+    const maybeUpdateStatus = skipStatus ? { status: '🤮' } : {};
     this.setState({
       gameOver: true,
       gameID: null,
       losingCell,
-      status: '🤮',
+      ...maybeUpdateStatus,
     });
   }
 
@@ -183,13 +184,24 @@ class App extends Component {
       gameOver: true,
       gameID: null,
     }, () => {
-      const name = prompt(`
+      let name = prompt(`
         your score is ${score(this.state)}.
         not great, not terrible. you definitely didnt apply yourself
         Whats your name?
       `);
-      registerName(gameID, name)
-        .then(this.setTop50)
+      if (!name) {
+        name = prompt(`
+          Seriously gimme your name. if you dont give me your name
+          i wont record your score
+        `);
+      }
+      if (!name) {
+        alert('wow you are just so humble.');
+        this.gameOver({}, true);
+      } else {
+        registerName(gameID, name)
+          .then(this.setTop50)
+      }
     });
   }
 
