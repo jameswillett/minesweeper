@@ -114,6 +114,9 @@ class App extends Component {
     if (this.state.timer) {
       clearInterval(this.state.timer);
     }
+    if (this.state.gameID) {
+      gameOverCall(this.state.gameID)
+    }
   }
 
   setTop50(top50) {
