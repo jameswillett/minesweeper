@@ -97,3 +97,8 @@ export const get3BV = (board) => {
 
   return edges.chunks + bits;
 };
+
+export const score = state => Math.floor((
+  ((state.threeBV ** 3) * ((state.difficulty ** 3) + 1)) /
+  ((state.clicks * 3 || 1) * (state.time  * 2 || 1))
+) * (!state.losingCell.x ? 10000 : 0));
