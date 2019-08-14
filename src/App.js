@@ -229,6 +229,12 @@ class App extends Component {
           }));
 
           sendClick(this.state.gameID, this.state.startedAt)
+            .catch(() => {
+              alert('something went wrong. your score wont be recorded but you can still play');
+              this.setState({
+                gameID: null,
+              });
+            })
             .then(() => {
               this.setState({
                 board: newBoard,
