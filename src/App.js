@@ -265,6 +265,9 @@ class App extends Component {
     const threeBV = get3BV(board);
     const startedAt = new Date();
 
+    if (this.state.gameID) {
+      gameOverCall(this.state.gameID);
+    }
     newGame(startedAt, threeBV, this.state.selectedDiff)
       .then(({ data }) =>
         this.setState({
