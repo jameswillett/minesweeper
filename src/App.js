@@ -460,7 +460,9 @@ class App extends Component {
                 <tr>
                   <td>{i + 1}</td>
                   <td>{s.name}</td>
-                  <td>{s.score}</td>
+                  <td style={{ textAlign: 'right', fontFamily: 'monospace'}}>
+                      {s.score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </td>
                   <td>{difficulties[s.difficulty]} ({s.difficulty + 1})</td>
                 </tr>
               ))}
