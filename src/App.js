@@ -84,7 +84,7 @@ class App extends Component {
       hint: null,
       touchTimer: null,
       skipContextMenu: false,
-      music: true,
+      music: false,
       startedAt: null,
       gameID: null,
       top50: [],
@@ -440,7 +440,7 @@ class App extends Component {
               <br />
               {!this.state.gameOver &&
                 <div>
-                  <audio loop autoPlay ref={ref => this.player = ref}>
+                  <audio loop ref={ref => this.player = ref}>
                     <source src='spiderman.mp3' />
                   </audio>
                   <button onClick={this.toggleMusic}>
