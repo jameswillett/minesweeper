@@ -452,14 +452,17 @@ class App extends Component {
         <div className="scoreBoard">
           {this.state.top50 &&
             <table>
-              <tr>
-                <th>RANK</th>
-                <th>NAME</th>
-                <th>SCORE</th>
-                <th>DIFFICULTY</th>
-              </tr>
-              {this.state.top50.map((s, i) => (
+              <thead>
                 <tr>
+                  <th>RANK</th>
+                  <th>NAME</th>
+                  <th>SCORE</th>
+                  <th>DIFFICULTY</th>
+                </tr>
+              </thead>
+              <tbody>
+              {this.state.top50.map((s, i) => (
+                <tr key={`${i + 1} id ${s.id}`}>
                   <td>{i + 1}</td>
                   <td>{s.name}</td>
                   <td style={{ textAlign: 'right', fontFamily: 'monospace'}}>
@@ -468,6 +471,7 @@ class App extends Component {
                   <td>{difficulties[s.difficulty]} ({s.difficulty + 1})</td>
                 </tr>
               ))}
+              </tbody>
             </table>
           }
         </div>
