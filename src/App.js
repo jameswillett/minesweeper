@@ -383,7 +383,7 @@ class App extends Component {
           </div>
         }
         {this.state.playing &&
-          <div style={{ display: 'inline-block' }}>
+          <div className="playArea">
             <div className="hud">Score: {score(this.state)}</div>
             <div className="hud">
               <span style={{ float: 'left' }}>{this.state.flags}</span>
