@@ -104,19 +104,27 @@ class App extends Component {
     this.handlePointerLeave = this.handlePointerLeave.bind(this);
     this.toggleMusic = this.toggleMusic.bind(this);
     this.setTop50 = this.setTop50.bind(this);
+    this.unloadHandler = this.unloadHandler.bind(this);
+  }
+
+  unloadHandler(e) {
+    e.preventDefault();
+    alert('{AOL "goodbye" SOUND}');
+    if (this.state.gameID) {
+      gameOverCall(this.state.gameID)
+    }
   }
 
   componentDidMount() {
     this.setTop50();
+    window.addEventListener("beforeunload", this.unloadHandler);
   }
 
   componentWillUnmount() {
     if (this.state.timer) {
       clearInterval(this.state.timer);
     }
-    if (this.state.gameID) {
-      gameOverCall(this.state.gameID)
-    }
+    window.removeEventListener("beforeunload", this.unloadHandler);
   }
 
   setTop50(top50) {
