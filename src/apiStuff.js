@@ -34,13 +34,14 @@ export const gameOverCall = id =>
 
 export const registerScore = (id, clicks, startedAt, board, difficulty) => {
   if (!id) return;
-  const t = new Date();
+  const t = String(new Date());
   return api.post('newscore', {
     id,
     clicks,
     startedAt,
     jarbled: jarbler(String(t)),
-    endedAt: t,
+    t,
+    endedAt: new Date(),
     board,
     difficulty
   });
