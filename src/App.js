@@ -61,7 +61,7 @@ const colors = [
   'darkgray',
 ];
 
-
+const commas = s => String(s).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
 class App extends Component {
   constructor() {
@@ -383,67 +383,69 @@ class App extends Component {
           </div>
         }
         {this.state.playing &&
-          <div className="playArea">
-            <div className="hud">Score: {score(this.state)}</div>
-            <div className="hud">
-              <span style={{ float: 'left' }}>{this.state.flags}</span>
-              <button className="statusGuy" onClick={this.startGame}>{this.state.status}</button>
-              <span style={{ float: 'right' }}>{String(this.state.time).padStart(3, '0')}</span>
+          <div>
+            <div className="hud">Score: {commas(score(this.state))}</div>
+            <div className="playArea">
+              <div className="hud">
+                <span style={{ float: 'left' }}>{this.state.flags}</span>
+                <button className="statusGuy" onClick={this.startGame}>{this.state.status}</button>
+                <span style={{ float: 'right' }}>{String(this.state.time).padStart(3, '0')}</span>
+                <br />
+              </div>
+              {this.state.board.map(row => (
+                <div className="row">
+                  {row.map(cell => (
+                    <button
+                      className={cell.clicked ? 'clicked' : 'butt'}
+                      style={cell.clicked && !cell.flagged && !cell.dunno && !cell.isMine ? {
+                        color: colors[cell.count], fontWeight: 900,
+                      }: {}}
+                      disabled={cell.clicked}
+                      onMouseUp={(e) => {
+                        if (e.button === 0) {
+                          this.handleCellClick(cell)
+                        }
+                      }}
+                      onMouseDown={this.suspense}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        if (!this.state.skipContextMenu) {
+                          this.handleCellRightClick(cell);
+                        } else {
+                          this.setState({ skipContextMenu: false });
+                        }
+                      }}
+                      onTouchStart={this.handlePointerDown(cell)}
+                      onTouchEnd={this.handlePointerUp(cell)}
+                      onTouchMove={this.handlePointerLeave}
+                      // onTouchCancel={this.handlePointerLeave}
+                    >
+                      {this.state.gameOver && !cell.flagged && cell.isMine && !isLosingCell(cell)
+                        ? '💩'
+                        : getOverlay(cell, this.state.gameOver, this.state.hint)
+                      }
+                    </button>
+                  ))}
+                </div>
+              ))}
+              <button disabled={this.state.hint} onClick={this.hint}>Gimme a dang hint</button>
               <br />
-            </div>
-            {this.state.board.map(row => (
-              <div className="row">
-                {row.map(cell => (
-                  <button
-                    className={cell.clicked ? 'clicked' : 'butt'}
-                    style={cell.clicked && !cell.flagged && !cell.dunno && !cell.isMine ? {
-                      color: colors[cell.count], fontWeight: 900,
-                    }: {}}
-                    disabled={cell.clicked}
-                    onMouseUp={(e) => {
-                      if (e.button === 0) {
-                        this.handleCellClick(cell)
-                      }
-                    }}
-                    onMouseDown={this.suspense}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      if (!this.state.skipContextMenu) {
-                        this.handleCellRightClick(cell);
-                      } else {
-                        this.setState({ skipContextMenu: false });
-                      }
-                    }}
-                    onTouchStart={this.handlePointerDown(cell)}
-                    onTouchEnd={this.handlePointerUp(cell)}
-                    onTouchMove={this.handlePointerLeave}
-                    // onTouchCancel={this.handlePointerLeave}
-                  >
-                    {this.state.gameOver && !cell.flagged && cell.isMine && !isLosingCell(cell)
-                      ? '💩'
-                      : getOverlay(cell, this.state.gameOver, this.state.hint)
-                    }
+              {!this.state.gameOver &&
+                <div>
+                  <audio loop autoPlay ref={ref => this.player = ref}>
+                    <source src='spiderman.mp3' />
+                  </audio>
+                  <button onClick={this.toggleMusic}>
+                    PLEASE {this.state.music ? 'STOP' : 'START'} THE MUSIC
                   </button>
-                ))}
-              </div>
-            ))}
-            <button disabled={this.state.hint} onClick={this.hint}>Gimme a dang hint</button>
-            <br />
-            {!this.state.gameOver &&
+                </div>
+              }
               <div>
-                <audio loop autoPlay ref={ref => this.player = ref}>
-                  <source src='spiderman.mp3' />
-                </audio>
-                <button onClick={this.toggleMusic}>
-                  PLEASE {this.state.music ? 'STOP' : 'START'} THE MUSIC
-                </button>
+                You like this dang site?<br />
+                <a href="https://github.com/jameswillett/minesweeper">
+                  Here&apos;s the dang code
+                </a>.
               </div>
-            }
-            <div>
-              You like this dang site?<br />
-              <a href="https://github.com/jameswillett/minesweeper">
-                Here&apos;s the dang code
-              </a>.
             </div>
           </div>
         }
@@ -461,7 +463,7 @@ class App extends Component {
                   <td>{i + 1}</td>
                   <td>{s.name}</td>
                   <td style={{ textAlign: 'right', fontFamily: 'monospace'}}>
-                      {s.score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {commas(s.score)}
                   </td>
                   <td>{difficulties[s.difficulty]} ({s.difficulty + 1})</td>
                 </tr>
