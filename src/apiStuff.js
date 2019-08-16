@@ -1,6 +1,6 @@
 import axios from 'axios';
+import jarbler from './jarbler';
 
-console.log(process.env);
 const api = axios.create({
   baseURL: `http://${
     process.env.NODE_ENV === 'production'
@@ -25,7 +25,8 @@ export const newGame = (startedAt, minClicks, difficulty) =>
 
 export const sendClick = (id, startedAt) => {
   if (!id) return Promise.resolve();
-  return api.post('recordclick', { id, startedAt });
+  const t = String(new Date());
+  return api.post('recordclick', { id, startedAt, t, jarbled: jarbler(t) });
 };
 
 export const gameOverCall = id =>
@@ -33,7 +34,16 @@ export const gameOverCall = id =>
 
 export const registerScore = (id, clicks, startedAt, board, difficulty) => {
   if (!id) return;
-  return api.post('newscore', { id, clicks, startedAt, endedAt: new Date(), board, difficulty });
+  const t = new Date();
+  return api.post('newscore', {
+    id,
+    clicks,
+    startedAt,
+    jarbled: jarbler(String(t)),
+    endedAt: t,
+    board,
+    difficulty
+  });
 };
 
 export const registerName = (id, name) => {
