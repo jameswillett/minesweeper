@@ -89,6 +89,7 @@ class App extends Component {
       gameID: null,
       top50: [],
       scoreNeighbors: [],
+      key: '',
     };
     this.handleSelect = this.handleSelect.bind(this);
     this.startGame = this.startGame.bind(this);
@@ -189,6 +190,7 @@ class App extends Component {
       this.state.startedAt,
       this.state.board,
       this.state.difficulty,
+      this.state.key,
     );
     this.setState({
       status: '😎',
@@ -239,18 +241,20 @@ class App extends Component {
             return cell;
           }));
 
-          sendClick(this.state.gameID, this.state.startedAt)
+          sendClick(this.state.gameID, this.state.startedAt, this.state.key)
             .catch(() => {
               alert('something went wrong. your score wont be recorded but you can still play');
               this.setState({
                 gameID: null,
               });
+              return { data: {} };
             })
-            .then(() => {
+            .then(({ data }) => {
               this.setState({
                 board: newBoard,
                 status: '🙂',
                 clicks: this.state.clicks + 1,
+                key: data.lastkey,
                 ...maybeResetHint,
               }, () => {
                 if (
@@ -277,7 +281,7 @@ class App extends Component {
       gameOverCall(this.state.gameID);
     }
     newGame(startedAt, threeBV, this.state.selectedDiff)
-      .then(({ data }) =>
+      .then(({ data }) => {
         this.setState({
           difficulty: this.state.selectedDiff,
           board,
@@ -293,8 +297,9 @@ class App extends Component {
           hint: null,
           startedAt,
           gameID: data.id,
+          key: data.lastkey,
         })
-      );
+      });
   }
 
   suspense(e) {

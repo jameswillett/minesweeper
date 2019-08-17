@@ -23,21 +23,21 @@ export const newGame = (startedAt, minClicks, difficulty) =>
     return { data: { id: null } };
   });
 
-export const sendClick = (id, startedAt) => {
+export const sendClick = (id, startedAt, key) => {
   if (!id) return Promise.resolve();
-  return api.post('recordclick', { id, startedAt, ...jarbler() });
+  return api.post('recordclick', { id, startedAt, key: jarbler(key) });
 };
 
 export const gameOverCall = id =>
   api.get(`gameover/${id}`);
 
-export const registerScore = (id, clicks, startedAt, board, difficulty) => {
+export const registerScore = (id, clicks, startedAt, board, difficulty, key) => {
   if (!id) return;
   return api.post('newscore', {
     id,
     clicks,
     startedAt,
-    ...jarbler(),
+    key: jarbler(key),
     endedAt: new Date(),
     board,
     difficulty
