@@ -17,16 +17,6 @@ import {
   makeBoard,
   score,
 } from './functions';
-import {
-  getTop50,
-  gameOverCall,
-  newGame,
-  sendClick,
-  registerScore,
-  registerName,
-} from './apiStuff';
-
-
 
 const getOverlay = (cell, gameOver, hintCell) => {
   if (cell.clicked) {
@@ -86,8 +76,6 @@ class App extends Component {
       skipContextMenu: false,
       music: false,
       startedAt: null,
-      gameID: null,
-      top50: [],
       scoreNeighbors: [],
       key: '',
     };
@@ -104,35 +92,6 @@ class App extends Component {
     this.handlePointerUp = this.handlePointerUp.bind(this);
     this.handlePointerLeave = this.handlePointerLeave.bind(this);
     this.toggleMusic = this.toggleMusic.bind(this);
-    this.setTop50 = this.setTop50.bind(this);
-    this.unloadHandler = this.unloadHandler.bind(this);
-  }
-
-  unloadHandler(e) {
-    e.preventDefault();
-    alert('{AOL "goodbye" SOUND}');
-    if (this.state.gameID) {
-      gameOverCall(this.state.gameID)
-    }
-  }
-
-  componentDidMount() {
-    this.setTop50();
-    window.addEventListener("beforeunload", this.unloadHandler);
-  }
-
-  componentWillUnmount() {
-    if (this.state.timer) {
-      clearInterval(this.state.timer);
-    }
-    window.removeEventListener("beforeunload", this.unloadHandler);
-  }
-
-  setTop50(top50) {
-    getTop50()
-      .then(({ data }) => {
-        this.setState({ top50: data.rows });
-      });
   }
 
   handleSelect(e) {
@@ -170,11 +129,9 @@ class App extends Component {
   gameOver(losingCell, skipStatus = false) {
     console.log('game over man, game over');
     if (this.state.timer) clearInterval(this.state.timer);
-    gameOverCall(this.state.gameID).catch(console.log)
     const maybeUpdateStatus = skipStatus ? { status: '🤮' } : {};
     this.setState({
       gameOver: true,
-      gameID: null,
       losingCell,
       ...maybeUpdateStatus,
     });
@@ -183,38 +140,14 @@ class App extends Component {
   winnerWinnerChickenDinner() {
     console.log('winnerWinnerChickenDinner')
     if (this.state.timer) clearInterval(this.state.timer);
-    const gameID = this.state.gameID;
-    registerScore(
-      this.state.gameID,
-      this.state.clicks,
-      this.state.startedAt,
-      this.state.board,
-      this.state.difficulty,
-      this.state.key,
-    );
     this.setState({
       status: '😎',
       gameOver: true,
-      gameID: null,
     }, () => {
-      let name = prompt(`
+      alert(`
         your score is ${score(this.state)}.
         not great, not terrible. you definitely didnt apply yourself
-        Whats your name?
       `);
-      if (!name) {
-        name = prompt(`
-          Seriously gimme your name. if you dont give me your name
-          i wont record your score
-        `);
-      }
-      if (!name) {
-        alert('wow you are just so humble.');
-        this.gameOver({}, true);
-      } else {
-        registerName(gameID, name)
-          .then(this.setTop50)
-      }
     });
   }
 
@@ -241,31 +174,21 @@ class App extends Component {
             return cell;
           }));
 
-          sendClick(this.state.gameID, this.state.startedAt, this.state.key)
-            .catch(() => {
-              alert('something went wrong. your score wont be recorded but you can still play');
-              this.setState({
-                gameID: null,
-              });
-              return { data: {} };
-            })
-            .then(({ data }) => {
-              this.setState({
-                board: newBoard,
-                status: '🙂',
-                clicks: this.state.clicks + 1,
-                key: data.lastkey,
-                ...maybeResetHint,
-              }, () => {
-                if (
-                  flatten(this.state.board)
-                    .filter(c => !c.clicked)
-                    .length === mineCounts[this.state.difficulty]
-                ) {
-                  this.winnerWinnerChickenDinner();
-                 }
-              });
-            });
+          this.setState({
+            board: newBoard,
+            status: '🙂',
+            clicks: this.state.clicks + 1,
+            key: "",
+            ...maybeResetHint,
+          }, () => {
+            if (
+              flatten(this.state.board)
+                .filter(c => !c.clicked)
+                .length === mineCounts[this.state.difficulty]
+            ) {
+              this.winnerWinnerChickenDinner();
+             }
+          });
         }
       });
     }
@@ -277,29 +200,22 @@ class App extends Component {
     const threeBV = get3BV(board);
     const startedAt = new Date();
 
-    if (this.state.gameID) {
-      gameOverCall(this.state.gameID);
-    }
-    newGame(startedAt, threeBV, this.state.selectedDiff)
-      .then(({ data }) => {
-        this.setState({
-          difficulty: this.state.selectedDiff,
-          board,
-          threeBV,
-          playing: true,
-          gameOver: false,
-          losingCell: {},
-          timer: setInterval(() => this.setState({ time: this.state.time + 1 }), 1000),
-          time: 0,
-          clicks: 0,
-          status: '🙂',
-          flags: mineCounts[this.state.selectedDiff],
-          hint: null,
-          startedAt,
-          gameID: data.id,
-          key: data.lastkey,
-        })
-      });
+    this.setState({
+      difficulty: this.state.selectedDiff,
+      board,
+      threeBV,
+      playing: true,
+      gameOver: false,
+      losingCell: {},
+      timer: setInterval(() => this.setState({ time: this.state.time + 1 }), 1000),
+      time: 0,
+      clicks: 0,
+      status: '🙂',
+      flags: mineCounts[this.state.selectedDiff],
+      hint: null,
+      startedAt,
+      key: "",
+    })
   }
 
   suspense(e) {
@@ -463,30 +379,7 @@ class App extends Component {
           </div>
         }
         <div className="scoreBoard">
-          {this.state.top50 &&
-            <table>
-              <thead>
-                <tr>
-                  <th>RANK</th>
-                  <th>NAME</th>
-                  <th>SCORE</th>
-                  <th>DIFFICULTY</th>
-                </tr>
-              </thead>
-              <tbody>
-              {this.state.top50.map((s, i) => (
-                <tr key={`${i + 1} id ${s.id}`}>
-                  <td>{i + 1}</td>
-                  <td>{s.name}</td>
-                  <td style={{ textAlign: 'right', fontFamily: 'monospace'}}>
-                    {commas(s.score)}
-                  </td>
-                  <td>{difficulties[s.difficulty]} ({s.difficulty + 1})</td>
-                </tr>
-              ))}
-              </tbody>
-            </table>
-          }
+          Wordle doesnt have a score board
         </div>
       </div>
     );
