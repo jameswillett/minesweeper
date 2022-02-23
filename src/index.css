@@ -1,7 +1,7 @@
 button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: inline-block;
+  vertical-align: bottom;
+  text-align: center;
 }
 
 table {
@@ -42,6 +42,9 @@ th {
   width:22px;
   cursor:pointer;
   font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .statusGuy {
@@ -60,6 +63,9 @@ th {
   height:22px;
   width:22px;
   font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .hud {

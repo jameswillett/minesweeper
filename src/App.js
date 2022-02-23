@@ -308,9 +308,7 @@ class App extends Component {
                 <option key={d} value={i}>{d}</option>
               ))}
             </select>
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <button onClick={this.startGame}>GO!</button>
-            </div>
+            <button onClick={this.startGame}>GO!</button>
           </div>
         }
         {this.state.playing &&
